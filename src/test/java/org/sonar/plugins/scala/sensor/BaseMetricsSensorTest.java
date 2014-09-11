@@ -96,18 +96,6 @@ public class BaseMetricsSensorTest {
   }
 
   @Test
-  public void shouldMeasureClassComplexityDistributionForOneScalaFileOnlyOnce() {
-    analyseOneScalaFile();
-    verify(sensorContext).saveMeasure(eq(new Measure(CoreMetrics.CLASS_COMPLEXITY_DISTRIBUTION)));
-  }
-
-  @Test
-  public void shouldMeasureClassComplexityDistributionForAllScalaFilesOnlyOnce() {
-    analyseAllScalaFiles();
-    verify(sensorContext).saveMeasure(eq(new Measure(CoreMetrics.CLASS_COMPLEXITY_DISTRIBUTION)));
-  }
-
-  @Test
   public void shouldMeasureFunctionComplexityDistributionForOneScalaFileOnlyOnce() {
     analyseOneScalaFile();
     verify(sensorContext).saveMeasure(eq(new Measure(CoreMetrics.FUNCTION_COMPLEXITY_DISTRIBUTION)));

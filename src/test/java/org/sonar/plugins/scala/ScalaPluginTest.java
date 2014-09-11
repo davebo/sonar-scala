@@ -23,8 +23,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.sonar.plugins.scala.cobertura.CoberturaSensor;
-import org.sonar.plugins.scala.surefire.SurefireSensor;
 
 public class ScalaPluginTest {
 
@@ -33,16 +31,6 @@ public class ScalaPluginTest {
     assertThat(new ScalaPlugin().getExtensions().size(), greaterThan(0));
   }
   
-  @Test
-  public void shouldHaveCoberturaPlugin() {
-	assertTrue(new ScalaPlugin().getExtensions().contains(CoberturaSensor.class));
-  }
-
-  @Test
-  public void shouldHaveSurefirePlugin() {
-    assertTrue(new ScalaPlugin().getExtensions().contains(SurefireSensor.class));
-  }
-
   @Test
   public void shouldGetPathToDependencies() {
     assertThat(ScalaPlugin.getPathToScalaLibrary(), containsString("scala-library"));

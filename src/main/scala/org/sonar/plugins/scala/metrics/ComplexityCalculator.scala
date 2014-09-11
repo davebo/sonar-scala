@@ -44,11 +44,6 @@ object ComplexityCalculator {
     case _ => 0
   }
 
-  def measureComplexityOfClasses(source: String) : MetricDistribution = {
-    measureComplexityDistribution(source, CoreMetrics.CLASS_COMPLEXITY_DISTRIBUTION,
-        classComplexityRanges, classOf[TmplDef])
-  }
-
   def measureComplexityOfFunctions(source: String) : MetricDistribution = {
     measureComplexityDistribution(source, CoreMetrics.FUNCTION_COMPLEXITY_DISTRIBUTION,
         functionComplexityRanges, classOf[FunDefOrDcl])
