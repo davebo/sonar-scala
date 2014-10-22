@@ -43,8 +43,8 @@
     <sonar.pluginName>Scala</sonar.pluginName>
     <sonar.pluginClass>org.sonar.plugins.scala.ScalaPlugin</sonar.pluginClass>
 
-    <scala.version>2.10.4</scala.version>
-    <scala.major.version>2.10</scala.major.version>
+    <scala.version>2.11.2</scala.version>
+    <scala.major.version>2.11</scala.major.version>
 
       <sonar.language>scala</sonar.language>
   </properties>
@@ -78,9 +78,9 @@
       <version>${scala.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.scalariform</groupId>
+      <groupId>com.danieltrinh</groupId>
       <artifactId>scalariform_${scala.major.version}</artifactId>
-      <version>0.1.4</version>
+      <version>0.1.5</version>
       <exclusions>
         <exclusion>
           <groupId>org.scala-lang</groupId>

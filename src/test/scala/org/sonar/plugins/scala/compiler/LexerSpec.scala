@@ -44,7 +44,7 @@ class LexerSpec extends FlatSpec with ShouldMatchers {
 
   it should "tokenize a doc comment" in {
     val comments = getCommentsOf("DocComment1")
-    comments should have size(1)
+    comments should have size(2)
     comments should contain (new Comment("/** Hello World */", CommentType.DOC))
   }
 

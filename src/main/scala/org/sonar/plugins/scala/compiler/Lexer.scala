@@ -24,6 +24,7 @@ import collection.mutable.ListBuffer
 import org.sonar.plugins.scala.language.{Comment, CommentType}
 import scala.reflect.io.AbstractFile
 import scala.reflect.internal.util.BatchSourceFile
+import scala.tools.nsc.util.{CharArrayReader, CharArrayReaderData}
 
 /**
  * This class is a wrapper for accessing the lexer of the Scala compiler
@@ -73,45 +74,68 @@ class Lexer {
     val comments = ListBuffer[Comment]()
     val scanner = new syntaxAnalyzer.UnitScanner(unit) {
 
-      private var lastDocCommentRange: Option[Range] = None
+    //  private var lastDocCommentRange: Option[Range] = None
 
-      private var foundToken = false
+    private var foundToken = false
 
-      override def nextToken() {
-        super.nextToken()
-        foundToken = token != 0
+    override def nextToken() {
+      super.nextToken()
+      foundToken = token != 0
+    }
+
+    override def skipComment(): Boolean = {
+      val reply: Boolean = super.skipComment()
+      val commentVal: String = source.content.mkString.substring(offset,lineStartOffset)
+
+      def isHeaderComment(value: String) = {
+        !foundToken && comments.isEmpty && value.trim().startsWith("/*")
       }
 
-      override def foundComment(value: String, start: Int, end: Int) = {
-        super.foundComment(value, start, end)
+      def isDocComment(value: String) = {
+        value.trim().startsWith("/*")
+      }
 
-        def isHeaderComment(value: String) = {
-          !foundToken && comments.isEmpty && value.trim().startsWith("/*")
-        }
-
-        lastDocCommentRange match {
-
-          case Some(r: Range) => {
-            if (r.start != start || r.end != end) {
-              comments += new Comment(value, CommentType.NORMAL)
-            }
+      if ( reply ) {
+        if (isDocComment(commentVal)) {
+          if (isHeaderComment(commentVal)) {
+            comments += new Comment(commentVal, CommentType.HEADER)
+          } else {
+            comments += new Comment(commentVal, CommentType.DOC)
           }
-
-          case None => {
-            if (isHeaderComment(value)) {
-              comments += new Comment(value, CommentType.HEADER)
-            } else {
-              comments += new Comment(value, CommentType.NORMAL)
-            }
-          }
+        } else {
+          comments += new Comment(commentVal, CommentType.NORMAL)
         }
       }
+      reply
+    }
 
-      override def foundDocComment(value: String, start: Int, end: Int) = {
-        super.foundDocComment(value, start, end)
-        comments += new Comment(value, CommentType.DOC)
-        lastDocCommentRange = Some(Range(start, end))
-      }
+     // override def foundComment(value: String, start: Int, end: Int) = {
+    //   super.foundComment(value, start, end)
+
+     //   lastDocCommentRange match {
+
+     //     case Some(r: Range) => {
+     //       if (r.start != start || r.end != end) {
+     //         comments += new Comment(value, CommentType.NORMAL)
+     //       }
+     //     }
+
+     //     case None => {
+     //       if (isHeaderComment(value)) {
+     //         comments += new Comment(value, CommentType.HEADER)
+     //       } else {
+     //         comments += new Comment(value, CommentType.NORMAL)
+     //       }
+     //     }
+     //   }
+     // }
+
+     // override def foundDocComment(value: String, start: Int, end: Int) = {
+     //   super.foundDocComment(value, start, end)
+     //   comments += new Comment(value, CommentType.DOC)
+     //   lastDocCommentRange = Some(Range(start, end))
+     // }
+
     }
 
     scanner.init()

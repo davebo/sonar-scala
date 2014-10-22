@@ -45,7 +45,13 @@ public class Comment {
   }
 
   public int getNumberOfLines() {
-    return lines.size() - getNumberOfBlankLines() - getNumberOfCommentedOutLinesOfCode();
+      int lineCount = lines.size();
+      int blankLineCount = getNumberOfBlankLines();
+      int commentedLineCount = getNumberOfCommentedOutLinesOfCode();
+      int skippableLines = blankLineCount + commentedLineCount;
+      int numberOfLines = lineCount - skippableLines;
+    return numberOfLines;
+    // return lines.size() - getNumberOfBlankLines() - getNumberOfCommentedOutLinesOfCode();
   }
 
   public int getNumberOfBlankLines() {

@@ -45,8 +45,16 @@ public class LinesAnalyzer {
   }
 
   public int countLinesOfCode() {
-    return countLines() - countBlankLines() - commentsAnalyzer.countCommentLines()
-        - commentsAnalyzer.countHeaderCommentLines() - commentsAnalyzer.countBlankCommentLines();
+    int lineCount = countLines();
+    int blankLineCount = countBlankLines();
+    int commentLineCount = commentsAnalyzer.countCommentLines();
+    int headerCommentLineCount = commentsAnalyzer.countHeaderCommentLines();
+    int blankCommentLineCount = commentsAnalyzer.countBlankCommentLines();
+    int linesOfCodeCount = lineCount - blankLineCount;
+    int linesOfCommentsCount = commentLineCount + headerCommentLineCount + blankCommentLineCount;
+    //return countLines() - countBlankLines() - commentsAnalyzer.countCommentLines()
+    //  - commentsAnalyzer.countHeaderCommentLines() - commentsAnalyzer.countBlankCommentLines();
+    return linesOfCodeCount - linesOfCommentsCount;
   }
 
   private int countBlankLines() {
