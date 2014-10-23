@@ -34,8 +34,7 @@ class LexerSpec extends FlatSpec with ShouldMatchers {
 
   private val lexer = new Lexer()
 
-  private val headerComment = "/*\r\n * This comment describes the\r\n" +
-      " * content of the file.\r\n */"
+  private val headerComment = "/*\r\n * This comment describes the\r\n * content of the file.\r\n */"
 
   "A lexer" should "tokenize a simple declaration of a value" in {
     val tokens = lexer.getTokens("val a = " + "\r\n" + "42")
@@ -43,8 +42,8 @@ class LexerSpec extends FlatSpec with ShouldMatchers {
   }
 
   it should "tokenize a doc comment" in {
-    val comments = getCommentsOf("DocComment1")
-    comments should have size(2)
+    val comments = getCommentsOf("DocCommentAfterHeader")
+    comments should have size(4)
     comments should contain (new Comment("/** Hello World */", CommentType.DOC))
   }
 
@@ -65,7 +64,7 @@ class LexerSpec extends FlatSpec with ShouldMatchers {
     val comments = getCommentsOf("HeaderCommentWithWrongStart")
     comments should have size(1)
     comments should contain (new Comment("/**\r\n * This comment describes the\r\n" +
-      " * content of the file.\r\n */", CommentType.DOC))
+      " * content of the file.\r\n */", CommentType.NORMAL))
   }
 
   it should "not tokenize a header comment when there was code before" in {

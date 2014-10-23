@@ -86,24 +86,41 @@ class Lexer {
     override def skipComment(): Boolean = {
       val reply: Boolean = super.skipComment()
       val commentVal: String = source.content.mkString.substring(offset,lineStartOffset)
+      var antecedeVal: String = ""
+      if ( source.content.mkString.substring(lineStartOffset) != null ) {
+        antecedeVal = source.content.mkString.substring(lineStartOffset)
+      }
 
       def isHeaderComment(value: String) = {
-        !foundToken && comments.isEmpty && value.trim().startsWith("/*")
+        !foundToken && comments.isEmpty && value.trim().startsWith("/*") && !value.trim().startsWith("/**")
       }
 
       def isDocComment(value: String) = {
-        value.trim().startsWith("/*")
+        /*
+          doc comment is
+          before a class, trait, or object declaration;
+          before a package object declaration (note that comments are not meaningful before packagings, see reference $9.2);
+          before a value member declaration (method, value, variable);
+          before a type member declaration (alias and abstract types).
+        */
+        def precedesDeclaration(): Boolean = {
+          val declarations = List("class","trait","object","def","protected","private","final","val","var","int","alias","abstract","override","fun","public","lazy","@")
+          val antecedeList = antecedeVal.trim.split("\\s+")
+          val antecedeFirstWord = antecedeList(0)
+          declarations.contains(antecedeFirstWord)
+        }
+        value.trim().startsWith("/**") && precedesDeclaration()
       }
 
       if ( reply ) {
-        if (isDocComment(commentVal)) {
-          if (isHeaderComment(commentVal)) {
-            comments += new Comment(commentVal, CommentType.HEADER)
-          } else {
-            comments += new Comment(commentVal, CommentType.DOC)
-          }
+        if (isHeaderComment(commentVal)) {
+          comments += new Comment(commentVal, CommentType.HEADER)
         } else {
-          comments += new Comment(commentVal, CommentType.NORMAL)
+          if (isDocComment(commentVal)) {
+            comments += new Comment(commentVal, CommentType.DOC)
+          } else {
+            comments += new Comment(commentVal, CommentType.NORMAL)
+          }
         }
       }
       reply

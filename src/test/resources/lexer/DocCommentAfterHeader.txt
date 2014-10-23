@@ -1,5 +1,10 @@
 /*
  * Header
  */
+package hrr.de.drr
 
 /** Hello World */
+class hrr {
+  // a comment
+  /* a comment which appears to refute the comment above */
+}
