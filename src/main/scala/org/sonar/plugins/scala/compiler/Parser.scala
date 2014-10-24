@@ -44,13 +44,14 @@ class Parser {
   }
 
   private def parse(batchSourceFile: BatchSourceFile, code: Array[Char]): Tree = {
+    val source = new ScriptSourceFile(batchSourceFile, code, 0)
     try {
-      val parser = new syntaxAnalyzer.SourceFileParser(new ScriptSourceFile(batchSourceFile, code, 0))
+      val parser = new syntaxAnalyzer.SourceFileParser(source)
       val tree = parser.templateStatSeq(false)._2
       parser.makePackaging(0, parser.atPos(0, 0, 0)(Ident(nme.EMPTY_PACKAGE_NAME)), tree)
     } catch {
       case _: Throwable => {
-        val unit = new CompilationUnit(batchSourceFile)
+        val unit = new CompilationUnit(source)
         val unitParser = new syntaxAnalyzer.UnitParser(unit) {
           override def showSyntaxErrors() {}
         }
