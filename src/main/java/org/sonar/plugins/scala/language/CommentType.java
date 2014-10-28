@@ -30,5 +30,6 @@ public enum CommentType {
 
   NORMAL,
   DOC,
+  PRIVATEDOC,
   HEADER;
 }

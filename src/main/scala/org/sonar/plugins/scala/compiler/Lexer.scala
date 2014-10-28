@@ -95,7 +95,7 @@ class Lexer {
         !foundToken && comments.isEmpty && value.trim().startsWith("/*") && !value.trim().startsWith("/**")
       }
 
-      def isDocComment(value: String) = {
+      def precedesDeclaration(): Boolean = {
         /*
           doc comment is
           before a class, trait, or object declaration;
@@ -103,56 +103,46 @@ class Lexer {
           before a value member declaration (method, value, variable);
           before a type member declaration (alias and abstract types).
         */
-        def precedesDeclaration(): Boolean = {
-          val declarations = List("class","trait","object","def","protected","private","final","val","var","int","alias","abstract","override","fun","public","lazy","@")
-          val antecedeList = antecedeVal.trim.split("\\s+")
-          val antecedeFirstWord = antecedeList(0)
-          declarations.contains(antecedeFirstWord)
-        }
+        val declarations = List("class","trait","object","def","protected","private","final","val","var","int","alias","abstract","override","fun","public","lazy","@")
+        val antecedeList = antecedeVal.trim.split("\\s+")
+        val antecedeFirstWord = antecedeList(0)
+        declarations.contains(antecedeFirstWord)
+      }
+
+      def precedesPrivateDeclaration(): Boolean = {
+        val declarations = List("private")
+        declarations.contains(antecedeVal)
+      }
+
+      def isDocComment(value: String) = {
         value.trim().startsWith("/**") && precedesDeclaration()
+      }
+
+      def isPublicDocComment(value: String) = {
+        isDocComment(value) && ! precedesPrivateDeclaration()
+      }
+
+      def isPrivateDocComment(value: String) = {
+        isDocComment(value) && precedesPrivateDeclaration()
       }
 
       if ( reply ) {
         if (isHeaderComment(commentVal)) {
           comments += new Comment(commentVal, CommentType.HEADER)
         } else {
-          if (isDocComment(commentVal)) {
+          if (isPublicDocComment(commentVal)) {
             comments += new Comment(commentVal, CommentType.DOC)
           } else {
-            comments += new Comment(commentVal, CommentType.NORMAL)
+            if (isPrivateDocComment(commentVal)) {
+              comments += new Comment(commentVal, CommentType.PRIVATEDOC)
+            } else {
+              comments += new Comment(commentVal, CommentType.NORMAL)
+            }
           }
         }
       }
-      reply
-    }
-
-     // override def foundComment(value: String, start: Int, end: Int) = {
-    //   super.foundComment(value, start, end)
-
-     //   lastDocCommentRange match {
-
-     //     case Some(r: Range) => {
-     //       if (r.start != start || r.end != end) {
-     //         comments += new Comment(value, CommentType.NORMAL)
-     //       }
-     //     }
-
-     //     case None => {
-     //       if (isHeaderComment(value)) {
-     //         comments += new Comment(value, CommentType.HEADER)
-     //       } else {
-     //         comments += new Comment(value, CommentType.NORMAL)
-     //       }
-     //     }
-     //   }
-     // }
-
-     // override def foundDocComment(value: String, start: Int, end: Int) = {
-     //   super.foundDocComment(value, start, end)
-     //   comments += new Comment(value, CommentType.DOC)
-     //   lastDocCommentRange = Some(Range(start, end))
-     // }
-
+        reply
+      }
     }
 
     scanner.init()

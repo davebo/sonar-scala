@@ -19,7 +19,8 @@
  */
 package org.sonar.plugins.scala.metrics
 
-import org.sonar.plugins.scala.compiler.{ Compiler, Parser }
+import org.sonar.plugins.scala.compiler.{ Compiler, Parser, Lexer }
+import org.sonar.plugins.scala.language.Comment
 
 /**
  * This object is a helper object for counting public api members.
@@ -39,8 +40,22 @@ object PublicApiCounter {
     countPublicApiTrees(parser.parse(source)).size
   }
 
+  private def countPublicApiDocs(source: String) = {
+    val lexer = new Lexer
+    val sourceComments: java.util.List[Comment] = lexer.getComments(source)
+    val it = sourceComments.iterator()
+    var commentCount: Int = 0
+    while (it.hasNext) {
+      val comm: Comment = it.next()
+      if (comm.isDocComment) {commentCount += 1}
+    }
+    commentCount
+  }
+
   def countUndocumentedPublicApi(source: String) = {
-    countPublicApiTrees(parser.parse(source)).count(!_.isDocumented)
+    val apiCount = countPublicApi(source)
+    val docCount = countPublicApiDocs(source)
+    apiCount - docCount
   }
 
   private def countPublicApiTrees(tree: Tree, wasDocDefBefore: Boolean = false,
